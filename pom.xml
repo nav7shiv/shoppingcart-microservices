@@ -1,0 +1,93 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- This is where Spring Boot stays -->
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.7.18</version>
+	</parent>
+
+	<groupId>com.navin</groupId>
+	<artifactId>shoppingcart-parent</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>Shopping Cart Parent Project</name>
+
+	<modules>
+		<module>common-models</module>
+		<module>product-service</module>
+		<module>order-service</module>
+		<module>user-service</module>
+		<module>cart-service</module>
+		<module>eureka-server</module>
+		<module>api-gateway</module>
+	</modules>
+
+	<properties>
+		<java.version>1.8</java.version>
+		<spring-cloud.version>2021.0.9</spring-cloud.version>
+		<maven.compiler.plugin>3.11.0</maven.compiler.plugin>
+		<mapstruct.version>1.5.5.Final</mapstruct.version>
+		<lombok.version>1.18.30</lombok.version>
+	</properties>
+	
+	<dependencyManagement>
+	    <dependencies>
+			<!-- Lombok -->
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<scope>provided</scope>
+				<version>${lombok.version}</version>
+			</dependency>
+		
+			<!-- Mapstruct -->
+	        <dependency>
+	            <groupId>org.mapstruct</groupId>
+	            <artifactId>mapstruct</artifactId>
+	            <version>${mapstruct.version}</version>
+	        </dependency>
+	        
+	    </dependencies>
+	</dependencyManagement>
+	
+	<build>
+		<pluginManagement>
+	        <plugins>
+	        	<!-- For Spring Boot maven to produce an executable JAR -->
+			    <plugin>
+			      <groupId>org.springframework.boot</groupId>
+			      <artifactId>spring-boot-maven-plugin</artifactId>
+			    </plugin>
+			    
+	            <!-- Compiler plugin to enable annotation processing -->
+	            <plugin>
+	                <groupId>org.apache.maven.plugins</groupId>
+	                <artifactId>maven-compiler-plugin</artifactId>
+	                <version>${maven.compiler.plugin}</version>
+	                <configuration>
+	                    <source>1.8</source>
+	                    <target>1.8</target>
+	                    <annotationProcessorPaths>
+	                        <path>
+	                            <groupId>org.mapstruct</groupId>
+	                            <artifactId>mapstruct-processor</artifactId>
+	                            <version>${mapstruct.version}</version>
+	                        </path>
+	                        <path>
+	                            <groupId>org.projectlombok</groupId>
+	                            <artifactId>lombok</artifactId>
+	                            <version>${lombok.version}</version>
+	                        </path>
+	                    </annotationProcessorPaths>
+	                </configuration>
+	            </plugin>
+	        </plugins>
+		</pluginManagement>
+	</build>
+	
+</project>

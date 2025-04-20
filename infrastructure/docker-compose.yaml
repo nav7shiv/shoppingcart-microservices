@@ -1,0 +1,169 @@
+version: '3.7'
+
+services:
+  mysql-product:
+    image: mysql:8.4
+    container_name: mysql-product
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${MYSQL_PRODUCT_DB}
+      MYSQL_USER: ${MYSQL_PRODUCT_USER}
+      MYSQL_PASSWORD: ${MYSQL_PRODUCT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PRODUCT_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-product-volume:/var/lib/mysql
+    networks:
+      - shoppingcart-network
+
+  product-service:
+    build:
+      context: ../
+      dockerfile: product-service/Dockerfile
+    container_name: product-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql-product
+    networks:
+      - shoppingcart-network
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-product:3306/${MYSQL_PRODUCT_DB}?useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_PRODUCT_USER}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PRODUCT_PASSWORD}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+
+  mysql-cart:
+    image: mysql:8.4
+    container_name: mysql-cart
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${MYSQL_CART_DB}
+      MYSQL_USER: ${MYSQL_CART_USER}
+      MYSQL_PASSWORD: ${MYSQL_CART_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_CART_ROOT_PASSWORD}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-cart-volume:/var/lib/mysql
+    networks:
+      - shoppingcart-network
+
+  cart-service:
+    build:
+      context: ../
+      dockerfile: cart-service/Dockerfile
+    container_name: cart-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysql-cart
+    networks:
+      - shoppingcart-network
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-cart:3306/${MYSQL_CART_DB}?useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_CART_USER}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_CART_PASSWORD}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+
+  mysql-order:
+    image: mysql:8.4
+    container_name: mysql-order
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${MYSQL_ORDER_DB}
+      MYSQL_USER: ${MYSQL_ORDER_USER}
+      MYSQL_PASSWORD: ${MYSQL_ORDER_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ORDER_ROOT_PASSWORD}
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql-order-volume:/var/lib/mysql
+    networks:
+      - shoppingcart-network
+
+  order-service:
+    build:
+      context: ../
+      dockerfile: order-service/Dockerfile
+    container_name: order-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - mysql-order
+    networks:
+      - shoppingcart-network
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-order:3306/${MYSQL_ORDER_DB}?useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_ORDER_USER}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_ORDER_PASSWORD}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+
+  mysql-user:
+    image: mysql:8.4
+    container_name: mysql-user
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${MYSQL_USER_DB}
+      MYSQL_USER: ${MYSQL_USER_USER}
+      MYSQL_PASSWORD: ${MYSQL_USER_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_USER_ROOT_PASSWORD}
+    ports:
+      - "3309:3306"
+    volumes:
+      - mysql-user-volume:/var/lib/mysql
+    networks:
+      - shoppingcart-network
+
+  user-service:
+    build:
+      context: ../
+      dockerfile: user-service/Dockerfile
+    container_name: user-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      - mysql-user
+    networks:
+      - shoppingcart-network
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-user:3306/${MYSQL_USER_DB}?useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER_USER}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_USER_PASSWORD}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+
+  eureka-server:
+    build:
+      context: ../
+      dockerfile: eureka-server/Dockerfile
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - shoppingcart-network
+
+  api-gateway:
+    build:
+      context: ../
+      dockerfile: api-gateway/Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    networks:
+      - shoppingcart-network
+    depends_on:
+      - eureka-server
+    environment:
+      - SPRING_APPLICATION_NAME=api-gateway
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+
+volumes:
+  mysql-product-volume:
+  mysql-cart-volume:
+  mysql-order-volume:
+  mysql-user-volume:
+
+networks:
+  shoppingcart-network:
+    driver: bridge

@@ -1,0 +1,13 @@
+# --- Maven files ---
+
+**/target/
+*.jar
+*.war
+
+# --- IDE files ---
+
+.classpath
+.project
+.settings/
+bin/
+.metadata/
