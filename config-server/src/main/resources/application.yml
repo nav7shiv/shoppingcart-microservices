@@ -1,0 +1,11 @@
+server:
+  port: 8888
+
+spring:
+  cloud:
+    config:
+      server:
+        git:
+          uri: ${GIT_REPO:https://github.com/nav7shiv/shoppingcart-config-repo}
+          clone-on-start: true
+          default-label: master
