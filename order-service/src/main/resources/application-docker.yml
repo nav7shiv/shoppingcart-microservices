@@ -1,15 +1,13 @@
 server:
-  port: 8082
+  port: 8083
 
 spring:
   application:
-    name: cart-service
+    name: order-service
   datasource:
     username: user
     password: user123
-    url: jdbc:mysql://mysql-cart:3306/cartdb?useSSL=false&allowPublicKeyRetrieval=true
-#for local
-#spring.datasource.url=jdbc:mysql://localhost:3307/cartdb?useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://mysql-order:3306/orderdb?useSSL=false&allowPublicKeyRetrieval=true
   jpa:
     properties:
       hibernate:

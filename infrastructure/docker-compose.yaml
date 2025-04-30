@@ -1,16 +1,6 @@
 version: '3.7'
 
 services:
-  eureka-server:
-    build:
-      context: ../
-      dockerfile: eureka-server/Dockerfile
-    container_name: eureka-server
-    ports:
-      - "8761:8761"
-    networks:
-      - shoppingcart-network
-
   config-server:
     build:
       context: ../
@@ -19,8 +9,17 @@ services:
       - "8888:8888"
     environment:
       - GIT_REPO=https://github.com/nav7shiv/shoppingcart-config-repo
+    networks:
+      - shoppingcart-network
+
+  eureka-server:
+    build:
+      context: ../
+      dockerfile: eureka-server/Dockerfile
+    ports:
+      - "8761:8761"
     depends_on:
-      - eureka-server
+      - config-server
     networks:
       - shoppingcart-network
 
@@ -56,7 +55,6 @@ services:
       - SPRING_DATASOURCE_USERNAME=${MYSQL_PRODUCT_USER}
       - SPRING_DATASOURCE_PASSWORD=${MYSQL_PRODUCT_PASSWORD}
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
-      - SPRING_CLOUD_CONFIG_URI:http://config-server:8888
 
   mysql-cart:
     image: mysql:8.4
@@ -170,6 +168,18 @@ services:
       - eureka-server
     environment:
       - SPRING_APPLICATION_NAME=api-gateway
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+
+  auth-service:
+    build:
+      context: ../
+      dockerfile: auth-service/Dockerfile
+    container_name: auth-service
+    ports:
+      - "8085:8085"
+    networks:
+      - shoppingcart-network
+    environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
 
 volumes:
